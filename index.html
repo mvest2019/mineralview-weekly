@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MineralView — Weekly Updates</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Lexend", sans-serif;
+        background: #f5f5f5;
+        padding: 32px 24px;
+        min-height: 100vh;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 1200px;
+        margin: auto;
+        padding: 32px 36px 40px;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+      }
+
+      /* TOP */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .page-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+      .page-sub {
+        font-size: 12px;
+        color: #bbb;
+        font-weight: 300;
+        margin-top: 2px;
+      }
+
+      /* CONTROLS */
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .ctrl-label {
+        font-size: 12px;
+        color: #999;
+        font-weight: 300;
+      }
+      .people-select {
+        font-family: "Lexend", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        color: #333;
+        background: #f9f9f9;
+        border: 1px solid #e0e0e0;
+        border-radius: 7px;
+        padding: 7px 32px 7px 12px;
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23aaa'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        min-width: 160px;
+      }
+      .btn-add-member {
+        font-family: "Lexend", sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        color: #5560b0;
+        background: #eef0fb;
+        border: 1px solid #c5c8f0;
+        border-radius: 7px;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-add-member:hover {
+        background: #e0e3f8;
+      }
+
+      /* SECTION LABEL */
+      .sec-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+      }
+
+      /* TABLE */
+      .tbl-wrap {
+        border: 1px solid #e8e8e8;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin-bottom: 32px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 960px;
+      }
+      thead th {
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+        white-space: nowrap;
+      }
+      .th-name {
+        background: #eef0fb;
+        color: #5560b0;
+        width: 110px;
+      }
+      .th-comp {
+        background: #f0f7f0;
+        color: #4a7c59;
+      }
+      .th-next {
+        background: #f0f7f0;
+        color: #4a7c59;
+      }
+      .th-blk {
+        background: #fdf0f5;
+        color: #9a3a5a;
+        width: 85px;
+      }
+      .th-stat {
+        background: #fdf6ec;
+        color: #9a6b2a;
+        width: 88px;
+      }
+      .th-upd {
+        background: #f5f1fb;
+        color: #7055a0;
+        width: 110px;
+      }
+      .th-ryan {
+        background: #f0f7fb;
+        color: #3a6e8a;
+        width: 160px;
+      }
+      .th-shaun {
+        background: #fdf0f5;
+        color: #9a3a5a;
+        width: 160px;
+      }
+      .th-act {
+        background: #f5f5f5;
+        color: #888;
+        width: 65px;
+      }
+
+      tbody td {
+        padding: 10px 14px;
+        border-bottom: 1px solid #f2f2f2;
+        font-size: 13px;
+        color: #333;
+        vertical-align: top;
+        line-height: 1.65;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: #fafafe;
+      }
+      .empty-row td {
+        text-align: center;
+        color: #ccc;
+        padding: 28px;
+        font-size: 13px;
+      }
+
+      td.c-name {
+        background: #fafbff;
+        font-weight: 500;
+        color: #1a1a1a;
+        vertical-align: middle;
+      }
+      td.c-comp {
+        background: #fafffd;
+        white-space: pre-wrap;
+      }
+      td.c-next {
+        background: #fafffd;
+        white-space: pre-wrap;
+      }
+      td.c-blk {
+        background: #fdf9fb;
+        vertical-align: middle;
+      }
+      td.c-stat {
+        background: #fffdf8;
+        vertical-align: middle;
+      }
+      td.c-upd {
+        background: #fdfaff;
+        font-size: 11px;
+        color: #bbb;
+        vertical-align: middle;
+      }
+      td.c-ryan {
+        background: #f9fbfd;
+        font-size: 12px;
+        color: #555;
+      }
+      td.c-shaun {
+        background: #fdf9fb;
+        font-size: 12px;
+        color: #555;
+      }
+      td.c-act {
+        background: #fafafa;
+        vertical-align: middle;
+      }
+
+      .badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 20px;
+      }
+      .b-green {
+        background: #edfaf4;
+        color: #1a9e5c;
+      }
+      .b-yellow {
+        background: #fffbec;
+        color: #b07800;
+      }
+      .b-red {
+        background: #fff0f0;
+        color: #c0392b;
+      }
+      .blk-yes {
+        color: #c0392b;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .blk-no {
+        color: #ccc;
+        font-size: 12px;
+      }
+
+      .btn-edit {
+        font-family: "Lexend", sans-serif;
+        font-size: 12px;
+        color: #5560b0;
+        background: none;
+        border: 1px solid #c5c8f0;
+        border-radius: 6px;
+        padding: 4px 10px;
+        cursor: pointer;
+      }
+      .btn-edit:hover {
+        background: #eef0fb;
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid #eee;
+        margin-bottom: 28px;
+      }
+
+      /* FORM */
+      .form-wrap {
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 24px 28px;
+      }
+      .form-head {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 24px;
+      }
+      .form-full {
+        grid-column: 1 / -1;
+      }
+      .fg {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .fg label {
+        font-size: 11px;
+        font-weight: 500;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .fg input,
+      .fg select,
+      .fg textarea {
+        font-family: "Lexend", sans-serif;
+        font-size: 13px;
+        color: #333;
+        background: #fff;
+        border: 1px solid #e4e4e4;
+        border-radius: 7px;
+        padding: 9px 12px;
+        outline: none;
+        transition: border 0.15s;
+      }
+      .fg input:focus,
+      .fg select:focus,
+      .fg textarea:focus {
+        border-color: #b0b4e8;
+      }
+      .fg textarea {
+        resize: vertical;
+        min-height: 160px;
+        line-height: 1.8;
+        font-size: 13px;
+      }
+      .field-hint {
+        font-size: 11px;
+        color: #bbb;
+        font-weight: 300;
+        margin-bottom: 6px;
+        line-height: 1.5;
+      }
+      .fg select {
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23aaa'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+      }
+      .stat-green {
+        background-color: #edfaf4 !important;
+        color: #1a9e5c !important;
+      }
+      .stat-yellow {
+        background-color: #fffbec !important;
+        color: #b07800 !important;
+      }
+      .stat-red {
+        background-color: #fff0f0 !important;
+        color: #c0392b !important;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        align-items: center;
+      }
+      .btn-save {
+        font-family: "Lexend", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        background: #5560b0;
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        padding: 9px 28px;
+        cursor: pointer;
+      }
+      .btn-save:hover {
+        background: #4450a0;
+      }
+      .btn-cancel {
+        font-family: "Lexend", sans-serif;
+        font-size: 13px;
+        color: #999;
+        background: none;
+        border: 1px solid #e4e4e4;
+        border-radius: 7px;
+        padding: 9px 20px;
+        cursor: pointer;
+      }
+      .btn-cancel:hover {
+        background: #f0f0f0;
+        color: #555;
+      }
+      .msg {
+        font-size: 12px;
+        margin-left: 4px;
+      }
+      .msg-ok {
+        color: #1a9e5c;
+      }
+      .msg-err {
+        color: #c0392b;
+      }
+
+      /* ADD MEMBER MODAL */
+      .modal-bg {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-bg.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 10px;
+        padding: 28px;
+        width: 320px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+      }
+      .modal h3 {
+        font-size: 15px;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 16px;
+      }
+      .modal input {
+        font-family: "Lexend", sans-serif;
+        font-size: 13px;
+        color: #333;
+        background: #fafafa;
+        border: 1px solid #e4e4e4;
+        border-radius: 7px;
+        padding: 9px 12px;
+        outline: none;
+        width: 100%;
+        margin-bottom: 14px;
+      }
+      .modal input:focus {
+        border-color: #b0b4e8;
+        background: #fff;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .modal-save {
+        font-family: "Lexend", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        background: #5560b0;
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        padding: 8px 20px;
+        cursor: pointer;
+        flex: 1;
+      }
+      .modal-cancel {
+        font-family: "Lexend", sans-serif;
+        font-size: 13px;
+        color: #999;
+        background: none;
+        border: 1px solid #e4e4e4;
+        border-radius: 7px;
+        padding: 8px 14px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <!-- TOP -->
+      <div class="topbar">
+        <div>
+          <p class="page-title">Operations — Weekly Updates</p>
+        </div>
+        <div class="controls">
+          <span class="ctrl-label">View by</span>
+          <select
+            class="people-select"
+            id="peopleSelect"
+            onchange="filterByPerson(this.value)"
+          >
+            <option value="all">All Team</option>
+          </select>
+          <button class="btn-add-member" onclick="openModal()">
+            + Add Team Member
+          </button>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <p class="sec-label">Updates</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="th-name">Name</th>
+              <th class="th-blk">Blockers</th>
+              <th class="th-stat">Status</th>
+              <th class="th-upd">Last Updated</th>
+              <th class="th-act">Edit</th>
+            </tr>
+          </thead>
+          <tbody id="list-body"></tbody>
+        </table>
+      </div>
+
+      <hr />
+
+      <!-- FORM -->
+      <div class="form-wrap">
+        <p class="form-head" id="form-head">＋ Add / Edit Update</p>
+        <div class="form-grid">
+          <div class="fg">
+            <label>Name</label>
+            <select id="f-name" onchange="onNameChange(this.value)">
+              <option value="">— select person —</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Status</label>
+            <select id="f-status" onchange="updateStatColor(this)">
+              <option value="Green">Green</option>
+              <option value="Yellow">Yellow</option>
+              <option value="Red">Red</option>
+            </select>
+          </div>
+
+          <div class="fg form-full">
+            <label>This Week</label>
+            <p class="field-hint">
+              What did you finish or progress this week? List each task on a new
+              line.
+            </p>
+            <textarea
+              id="f-completed"
+              placeholder="List each task on a new line..."
+            ></textarea>
+          </div>
+
+          <div class="fg form-full">
+            <label>Next Week</label>
+            <p class="field-hint">
+              What are you planning to work on next week? List each task on a
+              new line.
+            </p>
+            <textarea
+              id="f-nextweek"
+              placeholder="List each task on a new line..."
+            ></textarea>
+          </div>
+
+          <div class="fg form-full">
+            <label>Blockers</label>
+            <p class="field-hint">
+              Anything blocking your progress? Leave blank if none.
+            </p>
+            <textarea
+              id="f-blockers"
+              placeholder="Leave blank if no blockers."
+              style="min-height: 70px"
+            ></textarea>
+          </div>
+
+          <div class="fg">
+            <label>Ryan's Comment</label>
+            <textarea
+              id="f-ryan"
+              placeholder="Ryan's comment..."
+              style="min-height: 70px"
+            ></textarea>
+          </div>
+          <div class="fg">
+            <label>Shaun's Comment</label>
+            <textarea
+              id="f-shaun"
+              placeholder="Shaun's comment..."
+              style="min-height: 70px"
+            ></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="saveUpdate()">Save</button>
+          <button class="btn-cancel" onclick="resetForm()">Cancel</button>
+          <span class="msg" id="msg"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD MEMBER MODAL -->
+    <div class="modal-bg" id="modalBg">
+      <div class="modal">
+        <h3>Add Team Member</h3>
+        <input type="text" id="modal-name" placeholder="Full name" />
+        <div class="modal-actions">
+          <button class="modal-save" onclick="addMember()">Add</button>
+          <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function nowStr() {
+        return new Date().toLocaleString("en-GB", {
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+      function esc(t) {
+        if (!t || !t.trim()) return '<span style="color:#ddd">—</span>';
+        return t
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\n/g, "<br>");
+      }
+
+      // Team members list
+      let members = ["Nikhil"];
+
+      // Data store: { name: { completed, nextweek, blockers, status, ryan, shaun, updated } }
+      const store = {
+        Nikhil: {
+          completed:
+            "1. Constitution — Reviewed all constitution theory and all approaches before starting Cycle 1.\n2. Constitution Script — Reviewed all Python scripts, workflow, and how the process will function end-to-end.\n3. Script Prompt — Reviewed all script prompts before moving forward with the process.\n4. Script Implementation Guide — Implementing the script so one terminal command triggers the full workflow and updates all components.\n5. Admin Portal — Running Admin repo cleanup script, validating and updating items before execution.",
+          nextweek:
+            "1. Constitution — Run the implementation script and validate it is working.\n2. MineralView Launch Plan — Define and document the MineralView launch plan.\n3. Launch Cycle 1 — Work on Cycle 1 preliminary steps to start the cycle.\n4. Roadmap — Create the roadmap for Cycle 1 before launch.\n5. Admin Portal — Focus on the Admin Portal before starting to create the structure.\n6. Constitution Theory — Finalise the constitution theory before Cycle 1 launch.",
+          blockers: "",
+          status: "Green",
+          ryan: "",
+          shaun: "",
+          updated: nowStr(),
+        },
+      };
+
+      let currentFilter = "all";
+      let editingName = null;
+
+      function rebuildPeopleDropdown() {
+        const sel = document.getElementById("peopleSelect");
+        const cur = sel.value;
+        sel.innerHTML = '<option value="all">All Team</option>';
+        members.forEach((m) => {
+          const o = document.createElement("option");
+          o.value = m;
+          o.textContent = m;
+          if (m === cur) o.selected = true;
+          sel.appendChild(o);
+        });
+
+        const fSel = document.getElementById("f-name");
+        const fCur = fSel.value;
+        fSel.innerHTML = '<option value="">— select person —</option>';
+        members.forEach((m) => {
+          const o = document.createElement("option");
+          o.value = m;
+          o.textContent = m;
+          if (m === fCur) o.selected = true;
+          fSel.appendChild(o);
+        });
+      }
+
+      function filterByPerson(val) {
+        currentFilter = val;
+        renderList();
+        if (val !== "all" && store[val]) {
+          document.getElementById("f-name").value = val;
+          editRow(val);
+        } else {
+          resetForm();
+        }
+      }
+
+      function renderList() {
+        const tbody = document.getElementById("list-body");
+        tbody.innerHTML = "";
+        const toShow =
+          currentFilter === "all"
+            ? members
+            : members.filter((m) => m === currentFilter);
+        const visible = toShow.filter((m) => store[m]);
+
+        if (!visible.length) {
+          tbody.innerHTML =
+            '<tr class="empty-row"><td colspan="5">No updates yet. Use the form below to add one.</td></tr>';
+          return;
+        }
+
+        visible.forEach((name) => {
+          const r = store[name];
+          const hasBlk = r.blockers && r.blockers.trim().length > 0;
+          const bCls =
+            r.status === "Green"
+              ? "b-green"
+              : r.status === "Yellow"
+                ? "b-yellow"
+                : "b-red";
+          const tr = document.createElement("tr");
+          const cells = [
+            { cls: "c-name", html: name },
+            {
+              cls: "c-blk",
+              html: `<span class="${hasBlk ? "blk-yes" : "blk-no"}">${hasBlk ? "Yes" : "No"}</span>`,
+            },
+            {
+              cls: "c-stat",
+              html: `<span class="badge ${bCls}">${r.status}</span>`,
+            },
+            { cls: "c-upd", html: r.updated },
+            {
+              cls: "c-act",
+              html: `<button class="btn-edit" onclick="editRow('${name}')">Edit</button>`,
+            },
+          ];
+          cells.forEach((c) => {
+            const td = document.createElement("td");
+            td.className = c.cls;
+            td.innerHTML = c.html;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      }
+
+      function editRow(name) {
+        editingName = name;
+        const r = store[name] || {};
+        document.getElementById("f-name").value = name;
+        document.getElementById("f-completed").value = r.completed || "";
+        document.getElementById("f-nextweek").value = r.nextweek || "";
+        document.getElementById("f-blockers").value = r.blockers || "";
+        document.getElementById("f-status").value = r.status || "Green";
+        document.getElementById("f-ryan").value = r.ryan || "";
+        document.getElementById("f-shaun").value = r.shaun || "";
+        updateStatColor(document.getElementById("f-status"));
+        document.getElementById("form-head").textContent = "Editing — " + name;
+        document
+          .querySelector(".form-wrap")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+        hideMsg();
+      }
+
+      function onNameChange(val) {
+        if (val && store[val]) {
+          editRow(val);
+        } else {
+          editingName = null;
+          document.getElementById("f-completed").value = "";
+          document.getElementById("f-nextweek").value = "";
+          document.getElementById("f-blockers").value = "";
+          document.getElementById("f-status").value = "Green";
+          document.getElementById("f-ryan").value = "";
+          document.getElementById("f-shaun").value = "";
+          updateStatColor(document.getElementById("f-status"));
+          document.getElementById("form-head").textContent =
+            "＋ Add / Edit Update";
+          hideMsg();
+        }
+      }
+
+      function saveUpdate() {
+        const name = document.getElementById("f-name").value;
+        if (!name) {
+          showMsg("Please select a name.", "err");
+          return;
+        }
+        store[name] = {
+          completed: document.getElementById("f-completed").value.trim(),
+          nextweek: document.getElementById("f-nextweek").value.trim(),
+          blockers: document.getElementById("f-blockers").value.trim(),
+          status: document.getElementById("f-status").value,
+          ryan: document.getElementById("f-ryan").value.trim(),
+          shaun: document.getElementById("f-shaun").value.trim(),
+          updated: nowStr(),
+        };
+        renderList();
+        resetForm();
+        showMsg("Saved.", "ok");
+      }
+
+      function resetForm() {
+        editingName = null;
+        document.getElementById("f-name").value = "";
+        document.getElementById("f-completed").value = "";
+        document.getElementById("f-nextweek").value = "";
+        document.getElementById("f-blockers").value = "";
+        document.getElementById("f-status").value = "Green";
+        document.getElementById("f-ryan").value = "";
+        document.getElementById("f-shaun").value = "";
+        updateStatColor(document.getElementById("f-status"));
+        document.getElementById("form-head").textContent =
+          "＋ Add / Edit Update";
+        hideMsg();
+      }
+
+      function updateStatColor(sel) {
+        sel.className =
+          sel.value === "Green"
+            ? "stat-green"
+            : sel.value === "Yellow"
+              ? "stat-yellow"
+              : "stat-red";
+      }
+
+      function showMsg(txt, type) {
+        const el = document.getElementById("msg");
+        el.textContent = txt;
+        el.className = "msg " + (type === "ok" ? "msg-ok" : "msg-err");
+      }
+      function hideMsg() {
+        const el = document.getElementById("msg");
+        el.textContent = "";
+        el.className = "msg";
+      }
+
+      // MODAL
+      function openModal() {
+        document.getElementById("modalBg").classList.add("open");
+        document.getElementById("modal-name").focus();
+      }
+      function closeModal() {
+        document.getElementById("modalBg").classList.remove("open");
+        document.getElementById("modal-name").value = "";
+      }
+      function addMember() {
+        const name = document.getElementById("modal-name").value.trim();
+        if (!name) return;
+        if (!members.includes(name)) {
+          members.push(name);
+          rebuildPeopleDropdown();
+        }
+        closeModal();
+      }
+      document
+        .getElementById("modalBg")
+        .addEventListener("click", function (e) {
+          if (e.target === this) closeModal();
+        });
+      document
+        .getElementById("modal-name")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter") addMember();
+        });
+
+      // Init
+      rebuildPeopleDropdown();
+      renderList();
+    </script>
+  </body>
+</html>
