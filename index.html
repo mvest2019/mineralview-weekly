@@ -619,253 +619,144 @@
     </div>
 
     <script>
-      function nowStr() {
-        return new Date().toLocaleString("en-GB", {
-          day: "numeric",
-          month: "short",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      }
-      function esc(t) {
-        if (!t || !t.trim()) return '<span style="color:#ddd">—</span>';
-        return t
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/\n/g, "<br>");
-      }
+  function nowStr() {
+    return new Date().toLocaleString("en-GB", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 
-      // Team members list
-      let members = ["Nikhil"];
+  // 👉 LOAD FROM LOCAL STORAGE
+  let members = JSON.parse(localStorage.getItem("members")) || ["Nikhil"];
+  let store = JSON.parse(localStorage.getItem("store")) || {};
 
-      // Data store: { name: { completed, nextweek, blockers, status, ryan, shaun, updated } }
-      const store = {
-        Nikhil: {
-          completed:
-            "1. Constitution — Reviewed all constitution theory and all approaches before starting Cycle 1.\n2. Constitution Script — Reviewed all Python scripts, workflow, and how the process will function end-to-end.\n3. Script Prompt — Reviewed all script prompts before moving forward with the process.\n4. Script Implementation Guide — Implementing the script so one terminal command triggers the full workflow and updates all components.\n5. Admin Portal — Running Admin repo cleanup script, validating and updating items before execution.",
-          nextweek:
-            "1. Constitution — Run the implementation script and validate it is working.\n2. MineralView Launch Plan — Define and document the MineralView launch plan.\n3. Launch Cycle 1 — Work on Cycle 1 preliminary steps to start the cycle.\n4. Roadmap — Create the roadmap for Cycle 1 before launch.\n5. Admin Portal — Focus on the Admin Portal before starting to create the structure.\n6. Constitution Theory — Finalise the constitution theory before Cycle 1 launch.",
-          blockers: "",
-          status: "Green",
-          ryan: "",
-          shaun: "",
-          updated: nowStr(),
-        },
-      };
+  let currentFilter = "all";
+  let editingName = null;
 
-      let currentFilter = "all";
-      let editingName = null;
+  function saveToLocal() {
+    localStorage.setItem("members", JSON.stringify(members));
+    localStorage.setItem("store", JSON.stringify(store));
+  }
 
-      function rebuildPeopleDropdown() {
-        const sel = document.getElementById("peopleSelect");
-        const cur = sel.value;
-        sel.innerHTML = '<option value="all">All Team</option>';
-        members.forEach((m) => {
-          const o = document.createElement("option");
-          o.value = m;
-          o.textContent = m;
-          if (m === cur) o.selected = true;
-          sel.appendChild(o);
-        });
+  function rebuildPeopleDropdown() {
+    const sel = document.getElementById("peopleSelect");
+    sel.innerHTML = '<option value="all">All Team</option>';
+    members.forEach((m) => {
+      const o = document.createElement("option");
+      o.value = m;
+      o.textContent = m;
+      sel.appendChild(o);
+    });
 
-        const fSel = document.getElementById("f-name");
-        const fCur = fSel.value;
-        fSel.innerHTML = '<option value="">— select person —</option>';
-        members.forEach((m) => {
-          const o = document.createElement("option");
-          o.value = m;
-          o.textContent = m;
-          if (m === fCur) o.selected = true;
-          fSel.appendChild(o);
-        });
-      }
+    const fSel = document.getElementById("f-name");
+    fSel.innerHTML = '<option value="">— select person —</option>';
+    members.forEach((m) => {
+      const o = document.createElement("option");
+      o.value = m;
+      o.textContent = m;
+      fSel.appendChild(o);
+    });
+  }
 
-      function filterByPerson(val) {
-        currentFilter = val;
-        renderList();
-        if (val !== "all" && store[val]) {
-          document.getElementById("f-name").value = val;
-          editRow(val);
-        } else {
-          resetForm();
-        }
-      }
+  function filterByPerson(val) {
+    currentFilter = val;
+    renderList();
+  }
 
-      function renderList() {
-        const tbody = document.getElementById("list-body");
-        tbody.innerHTML = "";
-        const toShow =
-          currentFilter === "all"
-            ? members
-            : members.filter((m) => m === currentFilter);
-        const visible = toShow.filter((m) => store[m]);
+  function renderList() {
+    const tbody = document.getElementById("list-body");
+    tbody.innerHTML = "";
 
-        if (!visible.length) {
-          tbody.innerHTML =
-            '<tr class="empty-row"><td colspan="5">No updates yet. Use the form below to add one.</td></tr>';
-          return;
-        }
+    const list =
+      currentFilter === "all"
+        ? Object.keys(store)
+        : [currentFilter].filter((n) => store[n]);
 
-        visible.forEach((name) => {
-          const r = store[name];
-          const hasBlk = r.blockers && r.blockers.trim().length > 0;
-          const bCls =
-            r.status === "Green"
-              ? "b-green"
-              : r.status === "Yellow"
-                ? "b-yellow"
-                : "b-red";
-          const tr = document.createElement("tr");
-          const cells = [
-            { cls: "c-name", html: name },
-            {
-              cls: "c-blk",
-              html: `<span class="${hasBlk ? "blk-yes" : "blk-no"}">${hasBlk ? "Yes" : "No"}</span>`,
-            },
-            {
-              cls: "c-stat",
-              html: `<span class="badge ${bCls}">${r.status}</span>`,
-            },
-            { cls: "c-upd", html: r.updated },
-            {
-              cls: "c-act",
-              html: `<button class="btn-edit" onclick="editRow('${name}')">Edit</button>`,
-            },
-          ];
-          cells.forEach((c) => {
-            const td = document.createElement("td");
-            td.className = c.cls;
-            td.innerHTML = c.html;
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        });
-      }
+    if (!list.length) {
+      tbody.innerHTML =
+        '<tr class="empty-row"><td colspan="5">No updates yet.</td></tr>';
+      return;
+    }
 
-      function editRow(name) {
-        editingName = name;
-        const r = store[name] || {};
-        document.getElementById("f-name").value = name;
-        document.getElementById("f-completed").value = r.completed || "";
-        document.getElementById("f-nextweek").value = r.nextweek || "";
-        document.getElementById("f-blockers").value = r.blockers || "";
-        document.getElementById("f-status").value = r.status || "Green";
-        document.getElementById("f-ryan").value = r.ryan || "";
-        document.getElementById("f-shaun").value = r.shaun || "";
-        updateStatColor(document.getElementById("f-status"));
-        document.getElementById("form-head").textContent = "Editing — " + name;
-        document
-          .querySelector(".form-wrap")
-          .scrollIntoView({ behavior: "smooth", block: "start" });
-        hideMsg();
-      }
+    list.forEach((name) => {
+      const r = store[name];
+      const hasBlk = r.blockers && r.blockers.trim().length > 0;
 
-      function onNameChange(val) {
-        if (val && store[val]) {
-          editRow(val);
-        } else {
-          editingName = null;
-          document.getElementById("f-completed").value = "";
-          document.getElementById("f-nextweek").value = "";
-          document.getElementById("f-blockers").value = "";
-          document.getElementById("f-status").value = "Green";
-          document.getElementById("f-ryan").value = "";
-          document.getElementById("f-shaun").value = "";
-          updateStatColor(document.getElementById("f-status"));
-          document.getElementById("form-head").textContent =
-            "＋ Add / Edit Update";
-          hideMsg();
-        }
-      }
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="c-name">${name}</td>
+        <td class="c-blk">${hasBlk ? "Yes" : "No"}</td>
+        <td class="c-stat">${r.status}</td>
+        <td class="c-upd">${r.updated}</td>
+        <td class="c-act">
+          <button onclick="editRow('${name}')">Edit</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
-      function saveUpdate() {
-        const name = document.getElementById("f-name").value;
-        if (!name) {
-          showMsg("Please select a name.", "err");
-          return;
-        }
-        store[name] = {
-          completed: document.getElementById("f-completed").value.trim(),
-          nextweek: document.getElementById("f-nextweek").value.trim(),
-          blockers: document.getElementById("f-blockers").value.trim(),
-          status: document.getElementById("f-status").value,
-          ryan: document.getElementById("f-ryan").value.trim(),
-          shaun: document.getElementById("f-shaun").value.trim(),
-          updated: nowStr(),
-        };
-        renderList();
-        resetForm();
-        showMsg("Saved.", "ok");
-      }
+  function editRow(name) {
+    editingName = name;
+    const r = store[name];
 
-      function resetForm() {
-        editingName = null;
-        document.getElementById("f-name").value = "";
-        document.getElementById("f-completed").value = "";
-        document.getElementById("f-nextweek").value = "";
-        document.getElementById("f-blockers").value = "";
-        document.getElementById("f-status").value = "Green";
-        document.getElementById("f-ryan").value = "";
-        document.getElementById("f-shaun").value = "";
-        updateStatColor(document.getElementById("f-status"));
-        document.getElementById("form-head").textContent =
-          "＋ Add / Edit Update";
-        hideMsg();
-      }
+    document.getElementById("f-name").value = name;
+    document.getElementById("f-completed").value = r.completed;
+    document.getElementById("f-nextweek").value = r.nextweek;
+    document.getElementById("f-blockers").value = r.blockers;
+    document.getElementById("f-status").value = r.status;
+    document.getElementById("f-ryan").value = r.ryan;
+    document.getElementById("f-shaun").value = r.shaun;
+  }
 
-      function updateStatColor(sel) {
-        sel.className =
-          sel.value === "Green"
-            ? "stat-green"
-            : sel.value === "Yellow"
-              ? "stat-yellow"
-              : "stat-red";
-      }
+  function saveUpdate() {
+    const name = document.getElementById("f-name").value;
+    if (!name) {
+      alert("Select name");
+      return;
+    }
 
-      function showMsg(txt, type) {
-        const el = document.getElementById("msg");
-        el.textContent = txt;
-        el.className = "msg " + (type === "ok" ? "msg-ok" : "msg-err");
-      }
-      function hideMsg() {
-        const el = document.getElementById("msg");
-        el.textContent = "";
-        el.className = "msg";
-      }
+    store[name] = {
+      completed: document.getElementById("f-completed").value,
+      nextweek: document.getElementById("f-nextweek").value,
+      blockers: document.getElementById("f-blockers").value,
+      status: document.getElementById("f-status").value,
+      ryan: document.getElementById("f-ryan").value,
+      shaun: document.getElementById("f-shaun").value,
+      updated: nowStr(),
+    };
 
-      // MODAL
-      function openModal() {
-        document.getElementById("modalBg").classList.add("open");
-        document.getElementById("modal-name").focus();
-      }
-      function closeModal() {
-        document.getElementById("modalBg").classList.remove("open");
-        document.getElementById("modal-name").value = "";
-      }
-      function addMember() {
-        const name = document.getElementById("modal-name").value.trim();
-        if (!name) return;
-        if (!members.includes(name)) {
-          members.push(name);
-          rebuildPeopleDropdown();
-        }
-        closeModal();
-      }
-      document
-        .getElementById("modalBg")
-        .addEventListener("click", function (e) {
-          if (e.target === this) closeModal();
-        });
-      document
-        .getElementById("modal-name")
-        .addEventListener("keydown", function (e) {
-          if (e.key === "Enter") addMember();
-        });
+    saveToLocal();
+    renderList();
+  }
 
-      // Init
+  function addMember() {
+    const name = document.getElementById("modal-name").value.trim();
+    if (!name) return;
+
+    if (!members.includes(name)) {
+      members.push(name);
+      saveToLocal();
       rebuildPeopleDropdown();
-      renderList();
-    </script>
+    }
+
+    closeModal();
+  }
+
+  function openModal() {
+    document.getElementById("modalBg").classList.add("open");
+  }
+
+  function closeModal() {
+    document.getElementById("modalBg").classList.remove("open");
+    document.getElementById("modal-name").value = "";
+  }
+
+  // INIT
+  rebuildPeopleDropdown();
+  renderList();
+</script>
   </body>
 </html>
