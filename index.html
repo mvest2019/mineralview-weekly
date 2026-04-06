@@ -552,6 +552,7 @@
           <button class="btn-add-member" onclick="openModal()">
             + Add Team Member
           </button>
+          <button class="btn-add-member" onclick="exportCSV()">⬇ Export</button>
         </div>
       </div>
 
@@ -696,7 +697,8 @@
         }
 
         list.forEach((r) => {
-          const hasBlk = r.blockers && String(r.blockers).trim().length > 0;
+          const blkVal = String(r.blockers || "").trim().toLowerCase();
+const hasBlk = blkVal.length > 0 && !["no", "none", "null", "undefined", "false", "0", "-", "n/a", "na"].includes(blkVal);
           const status = r.status || "—";
           const statusClass = status === "Green" ? "b-green" : status === "Yellow" ? "b-yellow" : status === "Red" ? "b-red" : "";
 
@@ -1027,8 +1029,50 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;");
       }
+// ── EXPORT CSV ─────────────────────────────────────────────────────────────
+function exportCSV() {
+  try {
+    if (!allRecords.length) {
+      showToast("No data to export.", "err");
+      return;
+    }
 
-      // ── INIT ───────────────────────────────────────────────────────────────
+    const headers = ["Name", "Blocker", "This Week Task", "Next Week Task", "Ryan Comment", "Shaun Comment"];
+
+    const rows = allRecords.map(r => [
+      r.name || "",
+      r.blockers || "",
+      r.this_week_task || "",
+      r.next_week_task || "",
+      r.rayan_comment || "",
+      r.shown_comment || ""
+    ]);
+
+    let csvContent = headers.join(",") + "\n";
+
+    rows.forEach(row => {
+      csvContent += row.map(val =>
+        `"${String(val).replace(/"/g, '""')}"`
+      ).join(",") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `weekly_updates_${new Date().toISOString().slice(0, 10)}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast("CSV exported successfully!", "ok");
+
+  } catch (err) {
+    showToast(`Export failed: ${err.message}`, "err");
+  }
+}
+// ── INIT ───────────────────────────────────────────────────────────────
       fetchAll();
     </script>
   </body>
